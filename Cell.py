@@ -1,6 +1,8 @@
+"""Cell object in the 2-d list grid system"""
 import pygame
 from Constants import *
 from Wall import *
+
 
 class Cell(pygame.sprite.Sprite):
     """
@@ -54,6 +56,6 @@ class Cell(pygame.sprite.Sprite):
         self.set_color(BLACK)
         self.tree_visited = False
         self.adjacent_cells = []
-    
+
     def __repr__(self):
         return self.str_id

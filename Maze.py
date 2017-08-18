@@ -1,23 +1,21 @@
-"""
-Generate a maze object using depth-first searth backtracking algorithm
-"""
-import pygame
+""" Generate a maze object using depth-first searth backtracking algorithm """
 import random
-
-from Constants import *
 from Cell import *
+
 
 class Maze:
     """actual maze objects"""
 
     def __init__(self, screen):
-        """Construct a abstrat 2-d array object to represent grid of walls and cells
+        """
+        Construct a abstrat 2-d array object to represent grid of walls and cells
         @type screen: screen object to display
         """
         # construc a abstract grid system list of list of cell objects
         # x --> x position in the screen; y --> y position in the screen
         self.grid = []
-        # a unvisited dictionary {str_id: bool}
+
+        # {str_id: bool}
         self.unvisited_cell_dict = {}
 
         col = 0
@@ -82,21 +80,24 @@ class Maze:
             return [temp[n_cell] for n_cell in temp
                                  if temp[n_cell] and not temp[n_cell].visited]
         
-        def _remove_walls_btw(current, nxt):
+        def _remove_walls_btw(current_cell, nxt_cell):
             # current and nxt are Cell obj
             # use the cell id to determine the relative position btw cell1 and cell2
-            if current.id[0] == nxt.id[0]:  # top of bottom
-                if current.id[1] < nxt.id[1]:  # top cells
-                    current.bottom_wall.draw = nxt.top_wall.draw = False
-                elif current.id[1] > nxt.id[1]:
-                    current.top_wall.draw = nxt.bottom_wall.draw = False
-            elif current.id[1] == nxt.id[1]: # left or right
-                if current.id[0] < nxt.id[0]:
-                    current.right_wall.draw = nxt.left_wall.draw = False
-                elif current.id[0] > nxt.id[0]:
-                    current.left_wall.draw = nxt.right_wall.draw = False
+            if current_cell.id[0] == nxt_cell.id[0]:  # top of bottom
 
-        # main logics of create the maze
+                if current_cell.id[1] < nxt_cell.id[1]:  # top cells
+                    current_cell.bottom_wall.draw_to_screen = nxt_cell.top_wall.draw_to_screen = False
+                elif current_cell.id[1] > nxt_cell.id[1]:
+                    current_cell.top_wall.draw_to_screen = nxt_cell.bottom_wall.draw_to_screen = False
+            
+            elif current_cell.id[1] == nxt_cell.id[1]:  # left or right
+
+                if current_cell.id[0] < nxt_cell.id[0]:
+                    current_cell.right_wall.draw_to_screen = nxt_cell.left_wall.draw_to_screen = False
+                elif current_cell.id[0] > nxt_cell.id[0]:
+                    current_cell.left_wall.draw_to_screen = nxt_cell.right_wall.draw_to_screen = False
+
+        # main logic of create the maze
         while any(self.unvisited_cell_dict[cell] for cell in self.unvisited_cell_dict):
 
             current_cell.visited = True
