@@ -1,0 +1,5 @@
+Press A to get the Ai path
+Press D to delete the path and resume playing
+Arrow keys for movement the player
+
+set the wall length, screen width, and screen height in the constant.py file

@@ -1,0 +1,270 @@
+GAMECONTROLLER.PY:
+    # def custom_update(self, screen, background):
+    #     """update the screen efficiently by only blit the sprites rectangles that are moved
+    #     note: this only update the player and destination sprite
+
+    #     problem: old position = new position; only update the new position, but didnt update the old position
+    #     """
+    #     locations = []
+    #     # 1: Blit a piece of the background over the sprite’s current location, erasing it
+    #     # screen.blit(background, self.player.rect, self.player.rect)
+    #     old_pos = self.player.rect
+    #     for sprite in self.active_sprites:
+    #         screen.fill(BLACK, sprite.rect)
+    #         locations.append(sprite.rect)
+    #     # 2: append the old location of the sprites
+
+    #     locations.append(self.destination.rect)
+    #     #print('previous locaiton ' + str(self.player.rect.x) + ', ' + str(self.player.rect.y))
+    #     # 3: move the sprite
+    #     self.active_sprites.update()
+    #     # 4: draw sprite at the new locations
+    #     self.active_sprites.draw(screen)
+    #     # append sprite new locations
+    #     new_pos = self.player.rect
+    #     print(new_pos == old_pos)
+    #     locations.append(new_pos)
+    #     pygame.display.update(locations)
+
+
+    # display the wall sprites to the screen once
+    # gameController.wall_sprites.update()
+    # gameController.wall_sprites.draw(screen)
+    # pygame.display.update()
+
+    # background for cover the screen
+    # background = pygame.Surface([SCREEN_WIDTH, SCREEN_LENGTH]).convert()
+    # background.fill(WHITE)
+
+
+    
+def test_path_finding():
+    """for ai pathFinder testing"""
+    pygame.init()
+    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_LENGTH])
+    gameController = GameController()
+    pygame.display.set_caption('Maze')
+    clock = pygame.time.Clock()
+
+    # set up the scene
+    gameController.initialize_maze_map(screen)
+    gameController.build_ai_path()
+
+    gameController.ai_path.draw(screen)
+    gameController.wall_sprites.draw(screen)
+    pygame.display.update()
+
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+
+/------------------------------------Player.py
+        # horizontal boundaries
+        # if self.rect.left <= 0:
+        #     self.rect.left = 0
+        # if self.rect.right >= SCREEN_WIDTH:
+        #     self.rect.right = SCREEN_WIDTH
+        
+        # # vertical boundaries
+        # if self.rect.bottom >= SCREEN_LENGTH:
+        #     self.rect.bottom = SCREEN_LENGTH
+        # if self.rect.top <= 0:
+        #     self.rect.top = 0
+
+
+
+/--------------------------------------------------------------
+import pygame
+from Player import *
+from Maze import *
+from Constants import *
+from PathFinder import *
+
+class GameController:
+
+    def __init__(self, reference_screen): 
+
+        self.player = None
+        # set it in initaliz method
+        self.destination = None
+        self.wall_sprites = None
+        # get all the wall sprite and assign it into the group and assign to player
+        self.maze_obj = None
+        self.maze_grid = None
+        # contains player and destination sprites as a group
+        self.active_sprites = None  
+        self.timer = None
+        # a group of cell sprites that fill the colors
+        self.ai_path = None
+        self.path_copy = None
+
+        self.screen = reference_screen
+
+        self.show_path = False # condition to show the path on the screen
+        self.freeze_event_movements = False # condition to move the player
+    
+    def initialize_maze_map(self, screen):
+        """set up the maze up and ready to display on the screen"""
+        self.player = Player()
+
+        self.wall_sprites = pygame.sprite.Group()
+        self.active_sprites = pygame.sprite.Group()
+        self.ai_path = pygame.sprite.Group()
+
+        self.maze_obj = Maze(screen)
+        self.maze_grid = self.maze_obj.grid
+
+        # default position for the player
+        start_cell = self.maze_obj.get_cell(0, 0)
+        # this use algorithm to disable walls between cells
+        self.maze_obj.large_maze_generator(start_cell)
+
+        # insert all the wall sprites to the group so that it can be drawn later
+        for column in self.maze_grid:
+            for cell in column:
+                if cell.top_wall.draw:
+                    cell.top_wall.add(self.wall_sprites)
+                if cell.bottom_wall.draw:
+                    cell.bottom_wall.add(self.wall_sprites)
+                if cell.left_wall.draw:
+                    cell.left_wall.add(self.wall_sprites)
+                if cell.right_wall.draw:
+                    cell.right_wall.add(self.wall_sprites)
+
+        # assign the wall sprite group obj to the player to interacts
+        self.player.walls = self.wall_sprites
+        
+        # set destination obj to the correct location
+        dest_cell = self.maze_grid[-1][-1]
+        pos_x, pos_y = dest_cell.rect.x, dest_cell.rect.y
+        self.destination = Destination(pos_x, pos_y)
+
+        # set target
+        self.player.target = self.destination
+
+        # add player and destination sprites
+        self.active_sprites.add(self.player, self.destination)
+
+        # initialize the timer obj to time the delta to finish the game
+        self.timer = pygame.time.get_ticks()
+
+        # generate the path
+        self._build_ai_path()
+        self.path_copy = self.ai_path.copy()
+
+    def event_handler(self):
+        """handle movement events of the player and system events"""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+            else:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        if not self.freeze_event_movements:
+                            self.player.move_x(-SPEED)
+                    elif event.key == pygame.K_RIGHT:
+                        if not self.freeze_event_movements:
+                            self.player.move_x(SPEED)
+                    elif event.key == pygame.K_UP:
+                        if not self.freeze_event_movements:
+                            self.player.move_y(-SPEED)
+                    elif event.key == pygame.K_DOWN:
+                        if not self.freeze_event_movements:
+                            self.player.move_y(SPEED)
+                    elif event.key == pygame.K_a:  # the key for show the path
+                        self.show_path = True
+                        self.freeze_event_movements = True
+                    elif event.key == pygame.K_d:
+                        self.show_path = False
+                        self.freeze_event_movements = False
+                if event.type == pygame.KEYUP: # when the player lift up, stop moving
+                    if event.key == pygame.K_LEFT:
+                        self.player.move_x(0)
+                    elif event.key == pygame.K_RIGHT:
+                        self.player.move_x(0)
+                    elif event.key == pygame.K_UP:
+                        self.player.move_y(0)
+                    elif event.key == pygame.K_DOWN:
+                        self.player.move_y(0)
+        return False
+
+    def _build_ai_path(self, start_coordinate=(0, 0), end_coordinate=(-1, -1)):
+        """create the path from the start cell to the end cell"""
+        pathFinder = PathFinder(start_coordinate, end_coordinate, self.maze_grid)
+        cells_coordinates = pathFinder.recursive_depth_first_search(self.maze_grid[start_coordinate[0]]
+                                                                                  [start_coordinate[1]])
+        for x, y in cells_coordinates:
+            # GET THE CELL AND FILL THE COLOR
+            path_cell = self.maze_grid[x][y]
+            path_cell.image.fill(BLUE)
+            self.ai_path.add(path_cell)
+    
+    def _show_ai_path(self, screen):
+        """show the ai path onto the screen  call in the draw_frame function"""
+        if self.show_path:
+            self.ai_path = self.path_copy
+            self.ai_path.draw(screen)
+        if not self.show_path:
+            self.ai_path = pygame.sprite.Group()
+
+    def draw_frame(self, screen):
+        """update the screen by updating all sprites and screen"""
+        
+        self.active_sprites.update()
+
+        # CLEAR THE PREIVOUS SPRITES
+        screen.fill(BLACK)
+
+        # UPDATE THE LATEST POSITION OF ALL SPRITES
+        self.active_sprites.draw(screen)
+        self._show_ai_path(screen)
+        self.wall_sprites.draw(screen)
+        pygame.display.update()
+    
+    def replay(self, screen):
+        """once the destination are not in the screen, redraw the map"""
+
+        def _reset_all():
+            self.active_sprites.empty()
+            self.wall_sprites.empty()
+            self.active_sprites = self.wall_sprites = self.player = self.destination = self.maze_obj = self.timer = None
+
+        if len(self.active_sprites) <= 1:
+            # get the delta time that finished the game
+            deltaTime = pygame.time.get_ticks() - self.timer
+            print('Time finished the maze in seconds: {}s'.format(str(deltaTime / 1000)))
+            # clear all sprite:
+            _reset_all()
+            # redraw the maze map, player, and destination
+            self.initialize_maze_map(screen)
+
+def main():
+    """main function to handle the game"""
+    pygame.init()
+    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_LENGTH])
+    gameController = GameController()
+    pygame.display.set_caption('Maze')
+    clock = pygame.time.Clock()
+
+    # set up the scene
+    gameController.initialize_maze_map(screen)
+
+    done = False
+    while not done:
+
+        # handle all the event in the screen
+        done = gameController.event_handler()
+
+        gameController.draw_frame(screen)
+        #gameController.custom_update(screen, background)
+
+        gameController.replay(screen)
+
+        clock.tick(60)
+
+    pygame.quit()
+
+if __name__ == '__main__':
+    main()
