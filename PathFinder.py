@@ -51,7 +51,8 @@ class PathFinder:
             return []
     
     def depth_first_search_by_loop(self, x, y):
-        """implement depth-first search algorithm by using loop only
+        """
+        implement depth-first search algorithm by using loop only
         this function can generate the path for any maze map
         """
         stack = [self.tree_map[x][y]]

@@ -1,4 +1,4 @@
-Run the Game_Controller.py file to run the maze game
+Run the mAIN_gAME.py file to run the maze game
 
 Press A to get the Ai path
 Press D to delete the path and resume playing

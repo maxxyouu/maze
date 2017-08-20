@@ -13,14 +13,14 @@ class Wall(pygame.sprite.Sprite):
         super().__init__()
 
         # line properties
-        self.width = 1
+        self.width = WALL_WIDTH
         self.length = WALL_LENGTH
         self.color = WHITE
 
         self.start_pos = start_pos
         self.end_pos = end_pos
 
-        self.image = self._wall_orientation_image(self.start_pos, self.end_pos)
+        self.image = self._set_wall_orientation_image(self.start_pos, self.end_pos)
         self.image.fill(self.color)
 
         self.rect = self.image.get_rect()
@@ -30,7 +30,7 @@ class Wall(pygame.sprite.Sprite):
 
         self.draw_to_screen = True  # this determine to draw_to_screen the wall
     
-    def _wall_orientation_image(self, begin_pos, end_pos):
+    def _set_wall_orientation_image(self, begin_pos, end_pos):
         # determine the orientation of the wall and return the image
 
         if begin_pos[0] == end_pos[0]:  # vertical wall

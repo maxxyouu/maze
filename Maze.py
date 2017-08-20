@@ -1,4 +1,4 @@
-""" Generate a maze object using depth-first searth backtracking algorithm """
+""" Generate a maze object using depth-first search backtracking algorithm """
 import random
 from Cell import *
 
@@ -8,15 +8,14 @@ class Maze:
 
     def __init__(self, screen):
         """
-        Construct a abstrat 2-d array object to represent grid of walls and cells
+        Construct a abstract 2-d array object to represent grid of walls and cells
         @type screen: screen object to display
         """
-        # construc a abstract grid system list of list of cell objects
+        # construct a abstract grid system list of list of cell objects
         # x --> x position in the screen; y --> y position in the screen
         self.grid = []
 
-        # {str_id: bool}
-        self.unvisited_cell_dict = {}
+        self.unvisited_cell_dict = {}  # {str_id: bool}
 
         col = 0
         for x in range(0, SCREEN_WIDTH, WALL_LENGTH):
@@ -39,6 +38,7 @@ class Maze:
             # y is the row index
             # grid is self.grid
             # @return None
+            
             cell = self.grid[i][j]
             # top neighbour
             if j - 1 >= 0:
@@ -67,35 +67,34 @@ class Maze:
         """get the cell at grid system coordinate x, y"""
         return self.grid[x][y]
     
-    def large_maze_generator(self, current_cell):
+    def generate_maze(self, current_cell):
         """using loop to generate the maze by disable the walls in the cell
-        @type cell: Cell obj
-        @type animate: a toggle to show the animation of the maze
+        @type current_cell: Cell
         """
-        def _get_unvisited_neighbours(current_cell):
+        def _get_unvisited_neighbours(cur_cell):
             # get all the neighbour cells that are unvisited
-            temp = current_cell.neighbour_cells  # a temp dictionary of cells
+            temp = cur_cell.neighbour_cells  # a temp dictionary of cells
 
             # the following check if the cell has the neighbour and not visited
             return [temp[n_cell] for n_cell in temp
-                                 if temp[n_cell] and not temp[n_cell].visited]
+                    if temp[n_cell] and not temp[n_cell].visited]
         
-        def _remove_walls_btw(current_cell, nxt_cell):
+        def _remove_walls_btw(cur_cell, nxt_cell):
             # current and nxt are Cell obj
             # use the cell id to determine the relative position btw cell1 and cell2
-            if current_cell.id[0] == nxt_cell.id[0]:  # top of bottom
+            if cur_cell.id[0] == nxt_cell.id[0]:  # top of bottom
 
-                if current_cell.id[1] < nxt_cell.id[1]:  # top cells
-                    current_cell.bottom_wall.draw_to_screen = nxt_cell.top_wall.draw_to_screen = False
-                elif current_cell.id[1] > nxt_cell.id[1]:
-                    current_cell.top_wall.draw_to_screen = nxt_cell.bottom_wall.draw_to_screen = False
+                if cur_cell.id[1] < nxt_cell.id[1]:  # top cells
+                    cur_cell.bottom_wall.draw_to_screen = nxt_cell.top_wall.draw_to_screen = False
+                elif cur_cell.id[1] > nxt_cell.id[1]:
+                    cur_cell.top_wall.draw_to_screen = nxt_cell.bottom_wall.draw_to_screen = False
             
-            elif current_cell.id[1] == nxt_cell.id[1]:  # left or right
+            elif cur_cell.id[1] == nxt_cell.id[1]:  # left or right
 
-                if current_cell.id[0] < nxt_cell.id[0]:
-                    current_cell.right_wall.draw_to_screen = nxt_cell.left_wall.draw_to_screen = False
-                elif current_cell.id[0] > nxt_cell.id[0]:
-                    current_cell.left_wall.draw_to_screen = nxt_cell.right_wall.draw_to_screen = False
+                if cur_cell.id[0] < nxt_cell.id[0]:
+                    cur_cell.right_wall.draw_to_screen = nxt_cell.left_wall.draw_to_screen = False
+                elif cur_cell.id[0] > nxt_cell.id[0]:
+                    cur_cell.left_wall.draw_to_screen = nxt_cell.right_wall.draw_to_screen = False
 
         # main logic of create the maze
         while any(self.unvisited_cell_dict[cell] for cell in self.unvisited_cell_dict):

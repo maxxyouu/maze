@@ -8,25 +8,32 @@ class Player(pygame.sprite.Sprite):
     
     size = WALL_LENGTH - (WALL_LENGTH * 0.2)
 
-    def __init__(self, grid):
+    def __init__(self, grid, x_index, y_index, target=None):
         """
-        @type grid: a maze grid that has tunnel
+        :param grid: 2d cell arraylist
+        :param x_index: int
+        x index in grid
+        :param y_index: int
+        y index in grid
+        :param target: sprite object
         """
         super().__init__()
-        
         self.image = pygame.Surface([self.size, self.size]).convert()
         self.rect = self.image.get_rect()
         self.image.fill(RED)
-        self.rect.x, self.rect.y = (1, 1)
-        # center position of the player
-        self.center = self.rect.center
-
-        # use this as a movement
-        self.reference_grid = grid
-        self.relative_grid_position = [0, 0]
 
         # the target that the player collides with, initialize in Game_controller.py
-        self.target = None
+        self.target = target
+
+        self.reference_grid = grid
+        # assign random position in the grid to the player and assign the corresponding center coord to the player
+        self.x_index = x_index
+        self.y_index = y_index
+        # center the player at position
+        self.center = self.rect.center = self.reference_grid[self.x_index][self.y_index].rect.center
+
+        # use this as a movement
+        self.relative_grid_position = [self.x_index, self.y_index]
 
     def _get_cell_from_grid(self):
         # get the cell object from self.reference_grid
@@ -63,7 +70,7 @@ class Player(pygame.sprite.Sprite):
         # original cell position
         cell = self._get_cell_from_grid()
 
-        if 0 <= new_y <= len(self.reference_grid[self.relative_grid_position[0]]): # boundaries conditions
+        if 0 <= new_y <= len(self.reference_grid[self.relative_grid_position[0]]):  # boundaries conditions
             # wall conditions
             if y < 0 and not cell.top_wall.draw_to_screen:
                 self.relative_grid_position = [ori_x, new_y]
@@ -81,22 +88,33 @@ class Player(pygame.sprite.Sprite):
             self.target.kill()
 
     def update(self):
-        """update the position of the player and target collsion logics"""
+        """update the position of the player and target collision logic"""
+
         self._move_to_nxt_cell_position()
 
         self.collide_target()
 
 
-class Destination(pygame.sprite.Sprite):
+class Target(pygame.sprite.Sprite):
     """object that the player need to collide with"""
 
     size = WALL_LENGTH - (WALL_LENGTH * 0.2)
 
-    def __init__(self, center_x, center_y):
+    def __init__(self, x_index, y_index, grid):
+        """
+        :param x_index: int
+        x index of the grid
+        :param y_index: int
+        y index of the grid
+        :param grid: 2d list
+        """
         super().__init__()
 
-        self.image = pygame.Surface([self.size, self.size])
+        self.image = pygame.Surface([self.size, self.size]).convert()
         self.rect = self.image.get_rect()
         self.image.fill(GREEN)
-        # place at this cooridinate
-        self.rect.center = (center_x, center_y)
+
+        self.x_index = x_index
+        self.y_index = y_index
+        cell = grid[self.x_index][self.y_index]
+        self.rect.center = cell.rect.center

@@ -40,10 +40,9 @@ class Cell(pygame.sprite.Sprite):
         # all the available cells from self for the maze
         self.adjacent_cells = []
 
-        # for deguging tuple of coordinates
-        self.id = None  # (0, 2)
-        self.str_id = None  # a string '02'
-    
+        self.id = None  # (0, 2) ex
+        self.str_id = None  # a string '02' ex
+
     def set_id(self, x, y):
         self.id = (x, y)
         self.str_id = str(x) + str(y)
