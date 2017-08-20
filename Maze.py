@@ -16,23 +16,25 @@ class Maze:
         # construct a abstract grid system list of list of cell objects
         # x --> x position in the screen; y --> y position in the screen
         self.grid = []
-
+        self.screen = screen
         self.unvisited_cell_dict = {}  # {str_id: bool}
 
-        col = 0
         width, height = normalize_screen_size(SCREEN_WIDTH, SCREEN_LENGTH, WALL_LENGTH)
-        for x in range(0, width, WALL_LENGTH):
-            self.grid.append([])  # create a new col in the screen
-            row = 0
-            for y in range(0, height, WALL_LENGTH):
-                cell = Cell(x, y, screen)
+        self._generate_2d_grid(width, height, self.grid)
 
-                cell.set_id(col, row)
-                self.unvisited_cell_dict[cell.str_id] = True
+        # assign neighbours to each cell object in the grid system
+        self._assign_neighbours_to_all_cells_in(self.grid)
+        
+        # used for backtrack
+        self.stack = []
+        self.current_cell = None
 
-                self.grid[col].append(cell)
-                row += 1
-            col += 1
+    def get_cell(self, x, y):
+        """get the cell at grid system coordinate x, y"""
+        return self.grid[x][y]
+
+    def _assign_neighbours_to_all_cells_in(self, cells_grid):
+        # assign neighbours to all the cells objects
 
         def _assign_neighbours_to_cell(i, j):
             # handle all EDGE CASES
@@ -41,7 +43,7 @@ class Maze:
             # y is the row index
             # grid is self.grid
             # @return None
-            
+
             cell = self.grid[i][j]
             # top neighbour
             if j - 1 >= 0:
@@ -56,19 +58,26 @@ class Maze:
             if i - 1 >= 0:
                 cell.neighbour_cells['left'] = self.grid[i - 1][j]
 
-        # assign neighbours to each cell object in the grid system
-        for col_index in range(len(self.grid)):
-            column = self.grid[col_index]
+        for col_index in range(len(cells_grid)):
+            column = cells_grid[col_index]
             for row_index in range(len(column)):
                 _assign_neighbours_to_cell(col_index, row_index)
-        
-        # used for backtrack
-        self.stack = []
-        self.current_cell = None
 
-    def get_cell(self, x, y):
-        """get the cell at grid system coordinate x, y"""
-        return self.grid[x][y]
+    def _generate_2d_grid(self, width, height, list_):
+        # modify the list_ to become a 2-D list that contains cells
+        col = 0
+        for x in range(0, width, WALL_LENGTH):
+            list_.append([])  # create a new col in the screen
+            row = 0
+            for y in range(0, height, WALL_LENGTH):
+                cell = Cell(x, y, self.screen)
+
+                cell.set_id(col, row)
+                self.unvisited_cell_dict[cell.str_id] = True
+
+                list_[col].append(cell)
+                row += 1
+            col += 1
     
     def generate_maze(self, current_cell):
         """using loop to generate the maze by disable the walls in the cell

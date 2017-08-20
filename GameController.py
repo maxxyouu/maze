@@ -24,8 +24,8 @@ class GameController:
         self.screen = reference_screen
 
         # sprite group
-        self.wall_sprites = pygame.sprite.Group()
-        self.moving_sprites_group = pygame.sprite.Group()
+        self.walls = pygame.sprite.Group()
+        self.moving_sprites = pygame.sprite.Group()
 
         # for path finding
         self.ai_path = pygame.sprite.Group()
@@ -40,7 +40,7 @@ class GameController:
         self.maze.generate_maze(start_cell)
 
         # insert all the wall sprites to the group so that it can be drawn later
-        self._build_wall_sprites(self.wall_sprites)
+        self._build_wall_sprites(self.walls)
 
         # initialize default position
         self.target_x_index = -1
@@ -56,7 +56,7 @@ class GameController:
         self.player = Player(self.maze_grid, self.player_x_index, self.player_y_index, self.target)
 
         # add player and destination sprites
-        self.moving_sprites_group.add(self.player, self.target)
+        self.moving_sprites.add(self.player, self.target)
 
         self.previous_ticked_time = pygame.time.get_ticks()
 
@@ -163,35 +163,35 @@ class GameController:
     def draw_frame(self):
         """update the screen by updating all sprites and screen"""
 
-        self.moving_sprites_group.update()
+        self.moving_sprites.update()
 
         # CLEAR THE PREVIOUS SPRITES
         self.screen.fill(BLACK)
 
         # UPDATE THE LATEST POSITION OF ALL SPRITES
-        self.moving_sprites_group.draw(self.screen)
+        self.moving_sprites.draw(self.screen)
         self._show_ai_path()
-        self.wall_sprites.draw(self.screen)
+        self.walls.draw(self.screen)
         pygame.display.update()
 
     def _reset_all(self):
         # reset all the sprite groups and and timer variables for a new maze get started
-        self.moving_sprites_group.empty()
-        self.wall_sprites.empty()
-        self.moving_sprites_group = self.wall_sprites = self.player = self.target = self.maze = self.previous_ticked_time = None
+        self.moving_sprites.empty()
+        self.walls.empty()
+        self.moving_sprites = self.walls = self.player = self.target = self.maze = self.previous_ticked_time = None
 
     def replay(self, screen):
         """once the destination are not in the screen, redraw the map"""
 
-        if len(self.moving_sprites_group) <= 1:
+        if len(self.moving_sprites) <= 1:
             # get the delta time that finished the game
             if self.targets_per_level_counter < TARGETS_PER_LEVEL:
                 self._locate_target_at_level()
                 self.targets_per_level_counter += 1
             else:
-                delta_time_in_seconds = str((pygame.time.get_ticks() - self.previous_ticked_time) / 1000)
+                delta_time = str((pygame.time.get_ticks() - self.previous_ticked_time) / 1000) + 's'
                 # store the statistics to
-                self.levels_stat[self.current_level] = delta_time_in_seconds + 's'
+                self.levels_stat[self.current_level] = delta_time
 
                 # clear all sprite:
                 self._reset_all()
@@ -201,7 +201,7 @@ class GameController:
     def _locate_target_at_level(self):
         """relocate the target in the same map when meet the condition"""
 
-        if len(self.moving_sprites_group) <= 1:
+        if len(self.moving_sprites) <= 1:
             # in case it relocate to the same location
             self.target_x_index, self.target_y_index = self._select_indices_in_grid()
             self.target = Target(self.target_x_index, self.target_y_index)
@@ -209,7 +209,7 @@ class GameController:
             # set target
             self.player.target = self.target
             # add the target to the sprite group
-            self.moving_sprites_group.add(self.target)
+            self.moving_sprites.add(self.target)
 
             # rethink the ai_path
             self._build_ai_path(end_coordinate=[self.target_x_index, self.target_y_index])
@@ -222,4 +222,4 @@ class GameController:
         """
         for level in self.levels_stat:
             print('level{} is finished'.format(level))
-            print('Time finished for this level in seconds: {}s'.format(str(self.levels_stat[level])))
+            print('Time finished for this level in seconds: {}'.format(str(self.levels_stat[level])))
