@@ -1,6 +1,8 @@
 """ Generate a maze object using depth-first search backtracking algorithm """
 import random
 from Cell import *
+from Utilities import normalize_screen_size
+from Constants import SCREEN_WIDTH, SCREEN_LENGTH, WALL_LENGTH
 
 
 class Maze:
@@ -18,10 +20,11 @@ class Maze:
         self.unvisited_cell_dict = {}  # {str_id: bool}
 
         col = 0
-        for x in range(0, SCREEN_WIDTH, WALL_LENGTH):
+        width, height = normalize_screen_size(SCREEN_WIDTH, SCREEN_LENGTH, WALL_LENGTH)
+        for x in range(0, width, WALL_LENGTH):
             self.grid.append([])  # create a new col in the screen
             row = 0
-            for y in range(0, SCREEN_LENGTH, WALL_LENGTH):
+            for y in range(0, height, WALL_LENGTH):
                 cell = Cell(x, y, screen)
 
                 cell.set_id(col, row)

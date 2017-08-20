@@ -33,11 +33,11 @@ class Player(pygame.sprite.Sprite):
         self.center = self.rect.center = self.reference_grid[self.x_index][self.y_index].rect.center
 
         # use this as a movement
-        self.relative_grid_position = [self.x_index, self.y_index]
+        self.grid_position = [self.x_index, self.y_index]
 
     def _get_cell_from_grid(self):
         # get the cell object from self.reference_grid
-        return self.reference_grid[self.relative_grid_position[0]][self.relative_grid_position[1]]
+        return self.reference_grid[self.grid_position[0]][self.grid_position[1]]
 
     def horizontal_movement_handler(self, x):
         """
@@ -46,17 +46,17 @@ class Player(pygame.sprite.Sprite):
         @type x: int speed of the player
         """
         # new cell position
-        new_x = self.relative_grid_position[0] + x
-        ori_y = self.relative_grid_position[1]
+        new_x = self.grid_position[0] + x
+        ori_y = self.grid_position[1]
         # original cell position
         cell = self._get_cell_from_grid()
 
         if 0 <= new_x <= len(self.reference_grid):  # boundaries conditions
             # wall conditions
             if x < 0 and not cell.left_wall.draw_to_screen:
-                self.relative_grid_position = [new_x, ori_y]
+                self.grid_position = [new_x, ori_y]
             elif x > 0 and not cell.right_wall.draw_to_screen:
-                self.relative_grid_position = [new_x, ori_y]
+                self.grid_position = [new_x, ori_y]
     
     def vertical_movement_handler(self, y):
         """
@@ -65,17 +65,17 @@ class Player(pygame.sprite.Sprite):
         @type y: int speed of the player
         """
         # new cell position
-        ori_x = self.relative_grid_position[0]
-        new_y = self.relative_grid_position[1] + y
+        ori_x = self.grid_position[0]
+        new_y = self.grid_position[1] + y
         # original cell position
         cell = self._get_cell_from_grid()
 
-        if 0 <= new_y <= len(self.reference_grid[self.relative_grid_position[0]]):  # boundaries conditions
+        if 0 <= new_y <= len(self.reference_grid[self.grid_position[0]]):  # boundaries conditions
             # wall conditions
             if y < 0 and not cell.top_wall.draw_to_screen:
-                self.relative_grid_position = [ori_x, new_y]
+                self.grid_position = [ori_x, new_y]
             elif y > 0 and not cell.bottom_wall.draw_to_screen:
-                self.relative_grid_position = [ori_x, new_y]
+                self.grid_position = [ori_x, new_y]
 
     def _move_to_nxt_cell_position(self):
         # move the player to the new cell's center position

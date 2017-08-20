@@ -2,13 +2,15 @@
 
 import pygame
 from GameController import GameController
-from Constants import SCREEN_WIDTH, SCREEN_LENGTH, FRAME
+from Constants import SCREEN_WIDTH, SCREEN_LENGTH, WALL_LENGTH, FRAME
+from Utilities import normalize_screen_size
 
 
 def main():
     """main function to handle the game"""
     pygame.init()
-    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_LENGTH])
+    width, height = normalize_screen_size(SCREEN_WIDTH, SCREEN_LENGTH, WALL_LENGTH)
+    screen = pygame.display.set_mode([width, height])
     game_controller = GameController(screen)
     pygame.display.set_caption('Maze War')
 
@@ -25,7 +27,6 @@ def main():
         clock.tick(FRAME)
 
     pygame.quit()
-
 
 if __name__ == '__main__':
     main()

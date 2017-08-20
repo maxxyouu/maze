@@ -84,9 +84,10 @@ class GameController:
         # @return tuple
         def generate_two_random_values():
             # return Tuple
-            x = random.randint(0, len(self.maze_grid) - 1)
-            y = random.randint(0, len(self.maze_grid[x]) - 1)
-            return x, y
+            x_index = random.randint(0, len(self.maze_grid) - 1)
+            y_index = random.randint(0, len(self.maze_grid[x_index]) - 1)
+            return x_index, y_index
+
         x, y = generate_two_random_values()
         if sprite == 'Player':
             while (x, y) == (self.target_x_index, self.target_y_index):
@@ -116,18 +117,14 @@ class GameController:
                         if not self.freeze_event_movements:
                             self.player.vertical_movement_handler(1)
                     elif event.key == pygame.K_a:  # the key for show the path
-                        self._build_ai_path(self.player.relative_grid_position, [self.target_x_index,
-                                                                                 self.target_y_index])
+                        self._build_ai_path(self.player.grid_position, [self.target_x_index, self.target_y_index])
                         self.path_copy = self.ai_path.copy()
-
                         self.show_path = True
                         self.freeze_event_movements = True
                     elif event.key == pygame.K_d:
                         self.show_path = False
                         self.freeze_event_movements = False
                     elif event.key == pygame.K_ESCAPE:
-                        # another way to close the game window
-                        # another way to close the game window
                         self.show_statistics()
                         return True
         return False
