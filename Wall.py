@@ -22,7 +22,6 @@ class Wall(pygame.sprite.Sprite):
 
         self.image = self._set_wall_orientation_image(self.start_pos, self.end_pos)
         self.image.fill(self.color)
-
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = start_pos
     
@@ -37,3 +36,11 @@ class Wall(pygame.sprite.Sprite):
             return pygame.Surface([self.width, self.length]).convert()
         # horizontal wall
         return pygame.Surface([self.length, self.width]).convert()
+
+    def set_wall_color(self, color):
+        """
+        set the wall color
+        :param: color RGB
+        :return: None
+        """
+        self.image.fill(color)

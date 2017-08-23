@@ -30,7 +30,7 @@ class PathFinder:
         # reset all the cell tree properties
         for column in self.tree_map:
             for cell in column:
-                cell.reset_treeProperties()
+                cell.reset_tree_props()
 
     def depth_first_search_by_recursion(self, x, y):
         """
@@ -49,25 +49,3 @@ class PathFinder:
                     return [cell.id] + path
         else:
             return []
-    
-    def depth_first_search_by_loop(self, x, y):
-        """
-        implement depth-first search algorithm by using loop only
-        this function can generate the path for any maze map
-        """
-        stack = [self.tree_map[x][y]]
-        path = []
-        while stack:
-            cell = stack.pop(0)
-            path.append(cell.id)
-            if cell.id == self.end_cell.id:
-                return path
-            elif not cell.adjacent_cells:
-                path.pop()
-            else:
-                for adjacent_cell in cell.adjacent_cells:
-                    x, y = adjacent_cell.id
-                    stack.append(self.tree_map[x][y])
-        return path
-
-

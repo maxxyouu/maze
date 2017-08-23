@@ -1,48 +1,45 @@
 """ Generate a maze object using depth-first search backtracking algorithm """
 import random
 from Cell import *
-from Utilities import normalize_screen_size
 from Constants import SCREEN_WIDTH, SCREEN_LENGTH, WALL_LENGTH
 
 
 class Maze:
     """actual maze objects"""
 
-    def __init__(self, screen):
+    def __init__(self, screen, screen_width, screen_height):
         """
         Construct a abstract 2-d array object to represent grid of walls and cells
         @type screen: screen object to display
         """
         # construct a abstract grid system list of list of cell objects
-        # x --> x position in the screen; y --> y position in the screen
         self.grid = []
         self.screen = screen
         self.unvisited_cell_dict = {}  # {str_id: bool}
 
-        width, height = normalize_screen_size(SCREEN_WIDTH, SCREEN_LENGTH, WALL_LENGTH)
-        self._generate_2d_grid(width, height, self.grid)
+        self._generate_2d_grid(screen_width, screen_height, self.grid)
 
         # assign neighbours to each cell object in the grid system
         self._assign_neighbours_to_all_cells_in(self.grid)
         
         # used for backtrack
         self.stack = []
-        self.current_cell = None
 
     def get_cell(self, x, y):
         """get the cell at grid system coordinate x, y"""
         return self.grid[x][y]
 
     def _assign_neighbours_to_all_cells_in(self, cells_grid):
-        # assign neighbours to all the cells objects
-
+        """
+        :param cells_grid: 2-d list
+        :return:
+        """
         def _assign_neighbours_to_cell(i, j):
-            # handle all EDGE CASES
-            # assign neighbours to grid[i][j]
-            # x is the col_index
-            # y is the row index
-            # grid is self.grid
-            # @return None
+            """
+            :param i: i index of the current cell
+            :param j: j index of the current cell
+            :return:
+            """
 
             cell = self.grid[i][j]
             # top neighbour
@@ -129,5 +126,6 @@ class Maze:
             elif self.stack:
                 # set the popped cell to the current_cell
                 current_cell = self.stack.pop()
+
                 
 

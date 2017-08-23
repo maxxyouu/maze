@@ -20,7 +20,7 @@ class Cell(pygame.sprite.Sprite):
         self.image = pygame.Surface([WALL_LENGTH, WALL_LENGTH])
         self.image.fill(BLACK)
         self.rect = self.image.get_rect()
-        # set the topleft of the cell
+        # set the top left of the cell
         self.rect.x, self.rect.y = x, y
         # get the center position of the cell
         self.center = self.rect.center
@@ -50,7 +50,7 @@ class Cell(pygame.sprite.Sprite):
     def set_color(self, color):
         self.image.fill(color)
     
-    def reset_treeProperties(self):
+    def reset_tree_props(self):
         """reset the properties that are used to generate a tree map"""
         self.set_color(BLACK)
         self.tree_visited = False

@@ -116,5 +116,7 @@ class Target(pygame.sprite.Sprite):
 
         self.x_index = x_index
         self.y_index = y_index
+        self.grid_position = [self.x_index, self.y_index]
+
         cell = grid[self.x_index][self.y_index]
         self.rect.center = cell.rect.center
